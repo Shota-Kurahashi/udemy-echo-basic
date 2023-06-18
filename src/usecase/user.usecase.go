@@ -7,8 +7,8 @@ import (
 )
 
 type IUserUseCase interface {
-	SignUp(user *model.User) (model.UserResponse, error)
-	SignIn(user *model.User) (string, error)
+	SignUp(user model.User) (model.UserResponse, error)
+	Login(user model.User) (string, error)
 }
 
 type userUseCase struct {
@@ -19,7 +19,7 @@ func NewUserUseCase(ur repository.IUserRepository) IUserUseCase {
 	return &userUseCase{ur}
 }
 
-func (uu *userUseCase) SignUp(user *model.User) (model.UserResponse, error) {
+func (uu *userUseCase) SignUp(user model.User) (model.UserResponse, error) {
 	hashed, err := utils.HashPassword(user.Password)
 
 	if err != nil {
@@ -37,7 +37,7 @@ func (uu *userUseCase) SignUp(user *model.User) (model.UserResponse, error) {
 	return res, nil
 }
 
-func (uu *userUseCase) SignIn(user *model.User) (string, error) {
+func (uu *userUseCase) Login(user model.User) (string, error) {
 	storedUser := model.User{}
 
 	if err := uu.ur.GetUserByEmail(&storedUser, user.Email); err != nil {
