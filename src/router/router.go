@@ -1,7 +1,9 @@
 package router
 
 import (
+	"ge-rest-api/src/config"
 	"ge-rest-api/src/controller"
+	"net/http"
 	"os"
 
 	echojwt "github.com/labstack/echo-jwt/v4"
@@ -18,9 +20,18 @@ func NewRouter(uc controller.IUserController, tc controller.ITaskController) *ec
 		AllowMethods:     []string{"GET", "PUT", "POST", "DELETE"},
 		AllowCredentials: true,
 	}))
+
+	e.Use(middleware.CSRFWithConfig(middleware.CSRFConfig{
+		CookiePath:     "/",
+		CookieDomain:   config.GetEnv("API_DOMAIN"),
+		CookieHTTPOnly: true,
+		CookieSameSite: http.SameSiteDefaultMode,
+	}))
+
 	e.POST("/signup", uc.SignUp)
 	e.POST("/login", uc.LogIn)
 	e.POST("/logout", uc.LogOut)
+	e.GET("/csrf", uc.CsrfToken)
 	t := e.Group("/tasks")
 	t.Use(echojwt.WithConfig(echojwt.Config{
 		SigningKey:  []byte(os.Getenv("SECRET")),

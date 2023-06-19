@@ -13,6 +13,7 @@ type IUserController interface {
 	SignUp(c echo.Context) error
 	LogIn(c echo.Context) error
 	LogOut(c echo.Context) error
+	CsrfToken(c echo.Context) error
 }
 
 type useController struct {
@@ -61,4 +62,12 @@ func (uc *useController) LogOut(context echo.Context) error {
 	utils.DeleteCookie(context)
 
 	return context.NoContent(http.StatusOK)
+}
+
+func (uc *useController) CsrfToken(context echo.Context) error {
+	token := context.Get("csrf").(string)
+
+	return context.JSON(http.StatusOK, echo.Map{
+		"csrf_token": token,
+	})
 }
